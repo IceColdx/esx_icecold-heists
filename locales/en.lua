@@ -5,7 +5,7 @@ Locales['en'] = {
 	['heist_cancelled'] = 'You have ~r~canceled~s~ the heist at: ',
 
 	['rasp_needed'] = 'You need a ~o~Raspberry PI 3~s~ to hack!',
-	['torch_needed'] = 'You need a ~o~Blowtorch~s~ to open these deposit boxes.',
+	['blowtorch_needed'] = 'You need a ~o~Blowtorch~s~ to open these deposit boxes.',
 	['lockpick_needed'] = 'You need a ~o~Lockpick~s~ to open this door.',
 
 	['keycard_green'] = 'You have used the ~g~green keycard~w~ to open the vault.',
