@@ -31,22 +31,27 @@ AddEventHandler("esx_icecold-heists:startRobbery", function(bankId)
 		if(cops >= Config.Cops)then
 
 			if xPlayer.getInventoryItem('raspberry').count >= 1 then
-				xPlayer.removeInventoryItem('raspberry', 1)
+				if xPlayer.getInventoryItem('blowtorch').count >= 1 then
+					xPlayer.removeInventoryItem('raspberry', 1)
+					xPlayer.removeInventoryItem('raspberry', 1)
 
-				for i=1, #xPlayers, 1 do
-					local xPlayer = ESX.GetPlayerFromId(xPlayers[i])
-					if xPlayer.job.name == 'police' then
-						TriggerClientEvent('chatMessage', -1, 'NEWS ', {255, 0, 0}, "- Heist in progress at: ^2" .. Bank["bankName"])
-						TriggerClientEvent('esx:showNotification', xPlayers[i], _U('heist_at') .. Bank["bankName"])
+					for i=1, #xPlayers, 1 do
+						local xPlayer = ESX.GetPlayerFromId(xPlayers[i])
+						if xPlayer.job.name == 'police' then
+							TriggerClientEvent('chatMessage', -1, 'NEWS ', {255, 0, 0}, "- Heist in progress at: ^2" .. Bank["bankName"])
+							TriggerClientEvent('esx:showNotification', xPlayers[i], _U('heist_at') .. Bank["bankName"])
+						end
 					end
+					heistOn = true
+					lastBank = Bank["bankName"]
+					TriggerClientEvent('esx:showNotification', source, _U('started_heist') .. Bank["bankName"])
+					TriggerClientEvent('esx:showNotification', source, _U('alarm_triggered'))
+					TriggerClientEvent("esx_icecold-heists:heistBlip", -1, bankId)
+	    		TriggerClientEvent("esx_icecold-heists:startRobbery", source, bankId)
+					TriggerClientEvent("esx_icecold-heists:tooFar", source, bankId)
+				else
+					TriggerClientEvent('esx:showNotification', source, _U('blowtorch_needed'))
 				end
-				heistOn = true
-				lastBank = Bank["bankName"]
-				TriggerClientEvent('esx:showNotification', source, _U('started_heist') .. Bank["bankName"])
-				TriggerClientEvent('esx:showNotification', source, _U('alarm_triggered'))
-				TriggerClientEvent("esx_icecold-heists:heistBlip", -1, bankId)
-    		TriggerClientEvent("esx_icecold-heists:startRobbery", source, bankId)
-				TriggerClientEvent("esx_icecold-heists:tooFar", source, bankId)
 			else
 				TriggerClientEvent('esx:showNotification', source, _U('rasp_needed'))
 			end
