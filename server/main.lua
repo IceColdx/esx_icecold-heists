@@ -124,6 +124,7 @@ end)
 RegisterServerEvent("esx_icecold-heists:vaultOpen")
 AddEventHandler("esx_icecold-heists:vaultOpen", function(bankId)
   TriggerClientEvent("esx_icecold-heists:openDoor", -1, bankId)
+	TriggerClientEvent("esx_icecold-heists:trolley", source, bankId)
 end)
 
 RegisterServerEvent("esx_icecold-heists:deskOpen")

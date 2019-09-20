@@ -28,6 +28,9 @@ local doorHeading = 0
 local door = {}
 local deskHeading = {}
 
+local cash = {}
+local LastEntity
+
 Citizen.CreateThread(function ()
     while ESX == nil do
         TriggerEvent('esx:getSharedObject', function(obj)
@@ -373,45 +376,53 @@ function StartRobbery(bankId)
               ESX.Game.Utils.DrawText3D({x = v.cashPickup[i].x, y = v.cashPickup[i].y, z = v.cashPickup[i].z}, "[~g~E~s~] Pickup cash", 0.35)
               if(GetDistanceBetweenCoords(pos, v.cashPickup[i].x, v.cashPickup[i].y, v.cashPickup[i].z, true) <= 2.0) then
                 if IsControlJustReleased(1, 51) then
-                  while true do
-                    Citizen.Wait(3000)
-                    table.insert(sum, BankHeists[bankId]["reward"])
-                    ESX.ShowNotification("~g~$" .. BankHeists[bankId]["reward"] .. _U('cash_to_bag'))
-                  end
-                  Citizen.CreateThread(function()
-                    local animDict = "anim@heists@ornate_bank@grab_cash"
-              			RequestAnimDict(animDict)
-              			RequestModel("hei_p_m_bag_var22_arm_s")
-              			RequestModel("hei_prop_hei_cash_trolly_01")
+                  local ped  = PlayerPedId()
+                  local coords = GetEntityCoords(ped)
 
-              			while not HasAnimDictLoaded(animDict) or
-              				not HasModelLoaded("hei_p_m_bag_var22_arm_s") or
-              				not HasModelLoaded("hei_prop_hei_cash_trolly_01") do
-              				Citizen.Wait(100)
-              			end
+                  ESX.Game.SpawnObject('prop_cs_heist_bag_01', {
+                    x = coords.x,
+                    y = coords.y,
+                    z = coords.z - 3
+                  }, function(object)
+                  local boneIndex  = GetPedBoneIndex(ped, 57005)
+                  AttachEntityToEntity(object, ped, boneIndex, -0.21, 0.05, -0.37, 18.0, 295.0, 255.0, true, true, false, true, 1, true)
+                  end)
 
-              			local ped = PlayerPedId()
-              			local targetPosition, targetRotation = (vec3(GetEntityCoords(ped))), vec3(GetEntityRotation(ped))
-              			local animPos = GetAnimInitialOffsetPosition(animDict, "grab", targetPosition, targetRotation, 0, 2)
-
-              			FreezeEntityPosition(ped, true)
-              			local netScene = NetworkCreateSynchronisedScene(targetPosition, targetRotation, 2, false, false, 1065353216, 0, 1.3)
-              			NetworkAddPedToSynchronisedScene(ped, netScene, animDict, "grab", 1.5, -4.0, 1, 16, 1148846080, 0)
-
-              		  local bag = CreateObject(GetHashKey("hei_p_m_bag_var22_arm_s"), targetPosition, 1, 1, 0)
-                		NetworkAddEntityToSynchronisedScene(bag, netScene, animDict, "bag_grab", 4.0, -8.0, 1)
-
-                		local trolly = CreateObject(GetHashKey("hei_prop_hei_cash_trolly_01"), v.cashPickup[i].x, v.cashPickup[i].y, v.cashPickup[i].z, 1, 1, 0)
-                    PlaceObjectOnGroundProperly(trolly)
-                		NetworkAddEntityToSynchronisedScene(trolly, netScene, animDict, "cart_cash_dissapear", 4.0, -8.0, 1)
-
-              			NetworkStartSynchronisedScene(netScene)
-              			Citizen.Wait(GetAnimDuration(animDict, "grab") * 1000) -- 47.93 secs
-
-              			NetworkStopSynchronisedScene(netScene)
-              			DeleteObject(bag)
-              			DeleteObject(trolly)
-              			FreezeEntityPosition(ped, false)
+                  TriggerEvent("mythic_progbar:client:progress", {
+                    name = "pickup",
+                    duration = 880,
+                    label = "Picking up cash",
+                    useWhileDead = false,
+                    canCancel = false,
+                    controlDisables = {
+                        disableMovement = true,
+                        disableCarMovement = true,
+                        disableMouse = false,
+                        disableCombat = true,
+                    },
+                    animation = {
+                      animDict = "anim@heists@ornate_bank@grab_cash",
+                      anim = "grab",
+                    }
+                    }, function(status)
+                      if not status then
+                        cashPickup(bankId)
+                        local ped  = PlayerPedId()
+                        if not IsEntityPlayingAnim(ped, "anim@heists@ornate_bank@grab_cash", "grab_idle", 3) then
+                          RequestAnimDict("anim@heists@ornate_bank@grab_cash")
+                        while not HasAnimDictLoaded("anim@heists@ornate_bank@grab_cash") do
+                          Citizen.Wait(1)
+                        end
+                          Citizen.Wait(1)
+                          TaskPlayAnim(ped, "anim@heists@ornate_bank@grab_cash", "grab_idle", 8.0, -8, -1, 1, 0, true, true, true)
+                        end
+                        while true do
+                          Citizen.Wait(0)
+                          if IsControlJustPressed(0, 32) or IsControlJustPressed(0, 33) or IsControlJustPressed(0, 34) or IsControlJustPressed(0, 35) then
+                            ClearPedTasks(ped)
+                          end
+                        end
+                      end
                   end)
                 end
               end
@@ -422,6 +433,69 @@ function StartRobbery(bankId)
     end
   end)
 end
+
+RegisterNetEvent('esx_icecold-heists:trolley')
+AddEventHandler('esx_icecold-heists:trolley', function(bankId)
+	Citizen.CreateThread(function()
+		local vaultobj = 0
+    local money = {}
+    local trolley = {}
+		while vaultobj < 1 do
+			for bank,v in pairs(BankHeists) do
+				for p = 1, #v.cashPickup, 1 do
+			    trolley[p] = CreateObject("hei_prop_hei_cash_trolly_03", v.cashPickup[p].x, v.cashPickup[p].y, v.cashPickup[p].z, true, true, true)
+					PlaceObjectOnGroundProperly(trolley[p])
+          SetEntityRotation(trolley[p], 0.0, 0.0, v.cashPickup[p].h, 1, true)
+          FreezeEntityPosition(trolley[p], true)
+          SetEntityAsMissionEntity(trolley[p], true, true)
+
+          for i=0, 0.72, 0.09 do
+            money[i] = CreateObject("hei_prop_heist_cash_pile", (GetOffsetFromEntityInWorldCoords(trolley[p], -0.40 + i, -0.183, 0.42)), true, true, true)
+            money[i] = CreateObject("hei_prop_heist_cash_pile", (GetOffsetFromEntityInWorldCoords(trolley[p], -0.40 + i, -0.010, 0.42)), true, true, true)
+            money[i] = CreateObject("hei_prop_heist_cash_pile", (GetOffsetFromEntityInWorldCoords(trolley[p], -0.40 + i, 0.163, 0.42)), true, true, true)
+            SetEntityRotation(money[i], 0.0, 0.0, v.cashPickup[p].h, 1, true)
+            print(i)
+          end
+          for i=0, 0.63, 0.09 do
+            money[i] = CreateObject("hei_prop_heist_cash_pile", (GetOffsetFromEntityInWorldCoords(trolley[p], - 0.35 + i, -0.040, 0.47)), true, true, true)
+            money[i] = CreateObject("hei_prop_heist_cash_pile", (GetOffsetFromEntityInWorldCoords(trolley[p], - 0.35 + i, 0.133, 0.47)), true, true, true)
+            SetEntityRotation(money[i], 0.0, 0.0, v.cashPickup[p].h, 1, true)
+          end
+        end
+        vaultobj = vaultobj + 1
+			end
+    end
+	end)
+end)
+
+function cashPickup(bankId)
+  Citizen.CreateThread(function()
+    local ped = PlayerPedId()
+    local coords    = GetEntityCoords(ped)
+    local closestDistance = -1
+    local closestEntity   = nil
+    local object = GetClosestObjectOfType(coords, 1.0, GetHashKey('hei_prop_heist_cash_pile'), false, false, false)
+
+    if DoesEntityExist(object) then
+      local objCoords = GetEntityCoords(object)
+      local distance  = GetDistanceBetweenCoords(coords, objCoords, true)
+
+      if closestDistance == -1 or closestDistance > distance then
+        closestDistance = distance
+        closestEntity   = object
+      end
+    end
+    if closestDistance ~= -1 and closestDistance <= 1.0 then
+      if LastEntity ~= closestEntity then
+        DeleteEntity(closestEntity)
+        table.insert(sum, BankHeists[bankId]["reward"])
+        ESX.ShowNotification("~g~$" .. BankHeists[bankId]["reward"] .. _U('cash_to_bag'))
+        LastEntity = closestEntity
+      end
+    end
+  end)
+end
+
 
 function escape(bankId)
   escaping = true

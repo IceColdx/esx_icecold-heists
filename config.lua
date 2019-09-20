@@ -1,11 +1,11 @@
 Config = {}
 Config.Locale = 'en'
-Config.Cops = 2
+Config.Cops = 1
 Config.HeistCooldown = 1800               -- Bank lockdown after robbery in seconds
-Config.dyeTime = 900                        -- Time from bank to dye pack deactivation in seconds
+Config.dyeTime = 900                      -- Time from bank to dye pack deactivation in seconds
 Config.itemsPct = 20                      -- This is percent the script will add items
 Config.itemsMax = 2                       -- This is the max number of items you can receive
-Config.cardTime = {100,240,420,600,780}   -- Keycard time in seconds, (gold,black,red,green,blue)
+Config.cardTime = {5,240,420,600,780}   -- Keycard time in seconds, (gold,black,red,green,blue)
 Config.dyeChance = {90,70,50,30,10}       -- Chance for dye explosion in %, (gold,black,red,green,blue)
 Config.deskItems = {
   'water',
@@ -42,7 +42,7 @@ BankHeists = {
       ["model"] = -131754413, ["x"] = 145.55, ["y"] = -1040.76, ["z"] = 29.37, ["hStart"] = 249.846, ["hEnd"] = -205.599
     },
 		["Hack_Pos"] = { ["x"] = 147.00, ["y"] = -1046.16, ["z"] = 29.37 },
-    cashPickup = { x = 0, y = 0, z = 0, h = 0 },
+    cashPickup = { x = 0 , y = 0, z = 0, h = 0 },
     vault = {
       { x = 149.13, y = -1044.89, z = 29.35, h = 339.94 },
       { x = 150.32, y = -1045.42, z = 29.35, h = 339.94 },
@@ -142,18 +142,17 @@ BankHeists = {
 		--["Hack_Pos"] = { ["x"] = 261.9, ["y"] = 223.13, ["z"] = 106.28 },
     ["Hack_Pos"] = { ["x"] = 253.08, ["y"] = 228.45, ["z"] = 101.68 },
     cashPickup = {
-      { x =  0, y = 0, z = 0, h = 0 },
-    --  { x =  262.95, y = 215.97, z = 101.68, h = 50.0 },
-    --  { x =  262.39, y = 212.74, z = 101.68, h = 50.0 },
+      { x = 262.95, y = 215.97, z = 101.68, h = 0.0 },
+      { x = 262.12, y = 213.64, z = 101.68, h = 330.0 },
     },
     vault = {
       { x = 258.32, y = 218.34, z = 101.68, h = 340.56 },
       { x = 259.49, y = 217.87, z = 101.68, h = 340.56 },
       { x = 260.65, y = 217.46, z = 101.68, h = 340.56 },
 
-      { x = 259.48, y = 214.12, z = 101.68, h = 164.3 },
-      { x = 258.10, y = 214.58, z = 101.68, h = 164.3 },
-      { x = 256.72, y = 215.02, z = 101.68, h = 164.3 },
+      { x = 259.44, y = 213.90, z = 101.68, h = 161.3 },
+      { x = 258.34, y = 214.33, z = 101.68, h = 161.3 },
+      { x = 257.1, y = 214.73, z = 101.68, h = 161.3 },
     },
   	["reward"] = math.random(3000,4000),
 		["bankName"] = "The Principal Bank",
