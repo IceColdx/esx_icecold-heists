@@ -18,7 +18,6 @@ local fcDoor = 0
 local cardAccept = false
 local sum = {}
 local dyeChance = 0
-local dyeTime = 100
 local escaping = false
 local dyeActivated = false
 local dropoffSet = false
@@ -110,7 +109,7 @@ AddEventHandler("esx_icecold-heists:cardTime", function(bankId, _cardTime, _dyeC
 end)
 
 RegisterNetEvent("esx_icecold-heists:tooFar")
-AddEventHandler("esx_icecold-heists:tooFar", function()
+AddEventHandler("esx_icecold-heists:tooFar", function(bankId)
   Citizen.CreateThread(function()
     while true do
     Citizen.Wait(0)
@@ -138,7 +137,6 @@ function endEscape()
   sum = {}
   HackPosition = {}
   dyeChance = 0
-  dyeTime = 100
   vaultItems = false
   desk = {}
   totalCash = 0
@@ -170,9 +168,6 @@ Citizen.CreateThread(function()
                   desk_robbed[i] = false
                 end
                 findDoor(bank)
-                local ped = PlayerPedId()
-                TaskGoStraightToCoord(ped, door.x, door.y, door.z, 0.025, 5000, doorHeading, 0.1)
-                Citizen.Wait(1500)
                 TriggerServerEvent("esx_icecold-heists:lockpickDoor", bank)
               end
             end
@@ -224,9 +219,12 @@ RegisterNetEvent("esx_icecold-heists:desks")
 AddEventHandler("esx_icecold-heists:desks", function(bankId)
   Citizen.CreateThread(function()
     lockpicked = true
+    local ped = PlayerPedId()
+    TaskGoStraightToCoord(ped, door.x, door.y, door.z, 0.025, 5000, doorHeading, 0.1)
+    Citizen.Wait(1500)
     TriggerEvent("mythic_progbar:client:progress", {
       name = "lockpicking",
-      duration = 2000,
+      duration = 30000,
       label = "Lockpicking door..",
       useWhileDead = false,
       canCancel = false,
@@ -244,10 +242,10 @@ AddEventHandler("esx_icecold-heists:desks", function(bankId)
 }, function(status)
     if not status then
       if bankId ~= "PrincipalBank" then
-        desk[1] = (GetOffsetFromEntityInWorldCoords(fcDoor, -1.1, 1.0, -0.1))
-        desk[2] = (GetOffsetFromEntityInWorldCoords(fcDoor, -1.1, 2.5, -0.1))
-        desk[3] = (GetOffsetFromEntityInWorldCoords(fcDoor, -1.1, 4.0, -0.1))
-        desk[4] = (GetOffsetFromEntityInWorldCoords(fcDoor, -1.1, 5.4, -0.1))
+        desk[1] = (GetOffsetFromEntityInWorldCoords(fcDoor, -1.0, 1.0, -0.1))
+        desk[2] = (GetOffsetFromEntityInWorldCoords(fcDoor, -1.0, 2.5, -0.1))
+        desk[3] = (GetOffsetFromEntityInWorldCoords(fcDoor, -1.0, 4.0, -0.1))
+        desk[4] = (GetOffsetFromEntityInWorldCoords(fcDoor, -1.0, 5.4, -0.1))
         for i = 1, 4 do
           deskHeading[i] = doorHeading + 90
         end
@@ -282,6 +280,7 @@ AddEventHandler("esx_icecold-heists:desks", function(bankId)
               if IsControlJustPressed(0, 38) then
                 local ped = PlayerPedId()
                 TaskGoStraightToCoord(ped, desk[i].x, desk[i].y, desk[i].z, 0.025, 5000, deskHeading[i], 0.1)
+                print(deskHeading[i])
                 Citizen.Wait(1000)
                 deskItems = true
                 desk_robbed[i] = true
@@ -342,7 +341,7 @@ function StartRobbery(bankId)
 
                   TriggerEvent("mythic_progbar:client:progress", {
                 		  name = "blowtorching",
-                		  duration = 10000,
+                		  duration = 30000,
                 		  label = "Opening deposit box..",
                 		  useWhileDead = false,
                 		  canCancel = true,
@@ -485,9 +484,9 @@ function escape(bankId)
     end
 
     if dyePct <= dyeChance and dyeActivated then
-      local sec = SecondsToClock(dyeTime)
+      local sec = SecondsToClock(Config.dyeTime)
       drawTxt(0.82, 1.44, 1.0, 1.0, 0.4, _U('dye_time_left') .. sec, 255, 255, 255, 255)
-      if (dyeTime <= 0) then
+      if (Config.dyeTime <= 0) then
         ESX.ShowNotification(_U('cash_unusable'))
         StopParticleFxLooped(smoke)
         local ped = PlayerPedId()
@@ -514,7 +513,7 @@ function escape(bankId)
 
             TriggerEvent("mythic_progbar:client:progress", {
                 name = "deactivation",
-                duration = 10000,
+                duration = 15000,
                 label = "Waiting for deactivation..",
                 useWhileDead = false,
                 canCancel = true,
@@ -600,9 +599,9 @@ Citizen.CreateThread(function()
   while true do
     Citizen.Wait(0)
     if dyeActivated then
-      if(dyeTime > 0)then
+      if(Config.dyeTime > 0)then
         Citizen.Wait(1000)
-        dyeTime = dyeTime - 1
+        Config.dyeTime = Config.dyeTime - 1
       end
     end
   end
