@@ -33,7 +33,7 @@ AddEventHandler("esx_icecold-heists:startRobbery", function(bankId)
 			if xPlayer.getInventoryItem('raspberry').count >= 1 then
 				if xPlayer.getInventoryItem('blowtorch').count >= 1 then
 					xPlayer.removeInventoryItem('raspberry', 1)
-					xPlayer.removeInventoryItem('raspberry', 1)
+					xPlayer.removeInventoryItem('blowtorch', 1)
 
 					for i=1, #xPlayers, 1 do
 						local xPlayer = ESX.GetPlayerFromId(xPlayers[i])
