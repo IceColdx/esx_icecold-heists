@@ -1,11 +1,11 @@
 Config = {}
 Config.Locale = 'en'
-Config.Cops = 1
+Config.Cops = 2
 Config.HeistCooldown = 1800               -- Bank lockdown after robbery in seconds
 Config.dyeTime = 900                      -- Time from bank to dye pack deactivation in seconds
 Config.itemsPct = 20                      -- This is percent the script will add items
 Config.itemsMax = 2                       -- This is the max number of items you can receive
-Config.cardTime = {5,240,420,600,780}   -- Keycard time in seconds, (gold,black,red,green,blue)
+Config.cardTime = {100,240,420,600,780}   -- Keycard time in seconds, (gold,black,red,green,blue)
 Config.dyeChance = {90,70,50,30,10}       -- Chance for dye explosion in %, (gold,black,red,green,blue)
 Config.deskItems = {
   'water',
